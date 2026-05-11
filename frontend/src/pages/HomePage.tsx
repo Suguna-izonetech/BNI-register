@@ -9,6 +9,14 @@ const TEAMS = [
   'SPARK', 'OSCAR', 'TYCOON', 'ROYALS', 'WARRIORS',
 ];
 
+const STATS = [
+  { value: '20',      label: 'Teams'        },
+  { value: '190+',    label: 'Players'      },
+  { value: 'T6/8/10', label: 'Format'       },
+  { value: '1000+',   label: 'Entrepreneurs'},
+  { value: 'Trichy',  label: 'City'         },
+];
+
 export default function HomePage() {
   return (
     <>
@@ -17,33 +25,40 @@ export default function HomePage() {
       {/* ── Hero ── */}
       <section className="hero">
         <div className="hero-arc" aria-hidden="true" />
-        <div className="hero-center">
 
-          {/* Logo — transparent, full width */}
-          <img
-            src={LOGO_DATA_URL}
-            alt="BNI-TPL 2026 Trichy Premier League"
-            className="hero-logo"
-          />
-
-          {/* Single CTA */}
-          <div className="hero-actions">
-            <Link to="/register" className="btn-hero-primary">Register Now</Link>
+        <div className="hero-inner">
+          {/* Left — logo */}
+          <div className="hero-logo-wrap">
+            <img
+              src={LOGO_DATA_URL}
+              alt="BNI-TPL 2026 Trichy Premier League"
+              className="hero-logo"
+            />
           </div>
 
-          {/* Stats row */}
-          <div className="hero-stats">
-            {[
-              { value: '20',     label: 'Teams'   },
-              { value: '190+',   label: 'Players' },
-              { value: 'T20',    label: 'Format'  },
-              { value: 'Trichy', label: 'City'    },
-            ].map((s) => (
-              <div key={s.label} className="hero-stat-card">
-                <span className="hero-stat-value">{s.value}</span>
-                <span className="hero-stat-label">{s.label}</span>
-              </div>
-            ))}
+          {/* Right — text + CTA + stats */}
+          <div className="hero-content">
+            <h1 className="hero-title">BNI – TPL 2026</h1>
+            <h2 className="hero-subtitle">TRICHY PREMIER LEAGUE</h2>
+            <p className="hero-tagline">
+              <span className="tagline-dot">●</span>
+              Building Business Beyond Boundaries
+              <span className="tagline-dot">●</span>
+            </p>
+
+            <div className="hero-actions">
+              <Link to="/register" className="btn-hero-primary">Register Now</Link>
+            </div>
+
+            {/* Stats grid */}
+            <div className="hero-stats">
+              {STATS.map((s) => (
+                <div key={s.label} className="hero-stat-card">
+                  <span className="hero-stat-value">{s.value}</span>
+                  <span className="hero-stat-label">{s.label}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -109,6 +124,9 @@ export default function HomePage() {
         <img src={LOGO_DATA_URL} alt="BNI-TPL 2026" className="footer-logo" />
         <p>© 2026 BNI – TPL | Trichy Premier League. All rights reserved.</p>
         <p className="footer-tagline">Building Business Beyond Boundaries</p>
+        <p style={{ fontSize: '0.75rem', color: 'var(--charcoal-light)', marginTop: '0.25rem' }}>
+          Powered by <strong>@Izone</strong> · All rights reserved
+        </p>
       </footer>
     </>
   );
