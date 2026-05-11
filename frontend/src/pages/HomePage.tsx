@@ -11,7 +11,7 @@ const TEAMS = [
 
 const STATS = [
   { value: '20',      label: 'Teams'        },
-  { value: '190+',    label: 'Players'      },
+  { value: '300+',    label: 'Players'      },
   { value: 'T6/8/10', label: 'Format'       },
   { value: '1000+',   label: 'Entrepreneurs'},
   { value: 'Trichy',  label: 'City'         },

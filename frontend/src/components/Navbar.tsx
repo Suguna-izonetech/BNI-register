@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { LOGO_DATA_URL } from '../assets/logo';
+import { BNI_LOGO_DATA_URL } from '../assets/bniLogo';
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -8,7 +8,7 @@ export default function Navbar() {
   return (
     <nav className="navbar">
       <NavLink to="/" className="navbar-logo" onClick={() => setMenuOpen(false)}>
-        <img src={LOGO_DATA_URL} alt="BNI-TPL 2026" className="navbar-logo-img" />
+        <img src={BNI_LOGO_DATA_URL} alt="BNI Trichy" className="navbar-logo-img" />
       </NavLink>
 
       {/* Desktop links */}
