@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, File, Form, UploadFile
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
+from typing import List, Optional
 import io
 
 from app.db.database import get_db
@@ -8,6 +9,7 @@ from app.schemas.schemas import (
     AdminLogin, Token,
     PlayerRegistrationResponse,
     MatchCreate, MatchResultUpdate, MatchResponse,
+    NewsPostCreate, NewsPostUpdate, NewsPostResponse,
 )
 from app.core.security import create_access_token, get_current_admin
 from app.core.config import settings
@@ -15,7 +17,10 @@ from app.services.registration_service import get_all_registrations, export_regi
 from app.services.match_service import (
     create_match, update_match_result, delete_match, get_all_matches,
 )
-from typing import List
+from app.services.news_service import (
+    create_post, get_all_posts, get_post_by_id,
+    update_post, delete_post, save_news_image,
+)
 
 router = APIRouter(prefix="/admin", tags=["Admin"])
 
@@ -94,3 +99,80 @@ def remove_match(
 ):
     """Delete a match."""
     delete_match(db, match_id)
+
+
+# ── News / Blog Management ────────────────────────────────────────────
+
+@router.get("/news", response_model=List[NewsPostResponse])
+def admin_list_news(
+    category: Optional[str] = None,
+    db: Session = Depends(get_db),
+    current_admin: str = Depends(get_current_admin),
+):
+    """List all posts (including unpublished)."""
+    return get_all_posts(db, category=category, published_only=False)
+
+
+@router.post("/news", response_model=NewsPostResponse, status_code=201)
+async def admin_create_news(
+    title: str = Form(...),
+    category: str = Form("news"),
+    content: str = Form(...),
+    excerpt: Optional[str] = Form(None),
+    author: str = Form("BNI-TPL Admin"),
+    is_published: bool = Form(True),
+    image: Optional[UploadFile] = File(None),
+    db: Session = Depends(get_db),
+    current_admin: str = Depends(get_current_admin),
+):
+    """Create a news/blog post with optional cover image."""
+    data = NewsPostCreate(
+        title=title,
+        category=category,
+        content=content,
+        excerpt=excerpt,
+        author=author,
+        is_published=is_published,
+    )
+    image_url: Optional[str] = None
+    if image and image.filename:
+        image_url = await save_news_image(image)
+    return create_post(db, data, image_url=image_url)
+
+
+@router.put("/news/{post_id}", response_model=NewsPostResponse)
+async def admin_update_news(
+    post_id: int,
+    title: Optional[str] = Form(None),
+    category: Optional[str] = Form(None),
+    content: Optional[str] = Form(None),
+    excerpt: Optional[str] = Form(None),
+    author: Optional[str] = Form(None),
+    is_published: Optional[bool] = Form(None),
+    image: Optional[UploadFile] = File(None),
+    db: Session = Depends(get_db),
+    current_admin: str = Depends(get_current_admin),
+):
+    """Update a post. Only provided fields are changed."""
+    data = NewsPostUpdate(
+        title=title,
+        category=category,
+        content=content,
+        excerpt=excerpt,
+        author=author,
+        is_published=is_published,
+    )
+    image_url: Optional[str] = None
+    if image and image.filename:
+        image_url = await save_news_image(image)
+    return update_post(db, post_id, data, image_url=image_url)
+
+
+@router.delete("/news/{post_id}", status_code=204)
+def admin_delete_news(
+    post_id: int,
+    db: Session = Depends(get_db),
+    current_admin: str = Depends(get_current_admin),
+):
+    """Delete a post."""
+    delete_post(db, post_id)

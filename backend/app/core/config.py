@@ -18,6 +18,14 @@ class Settings(BaseSettings):
     DB_PASSWORD: str = "qqssxx&234#Tc"
     DB_SCHEMA: str = "BNI_registration"
 
+    # DB_HOST: str = "localhost"
+    # DB_PORT: int = 5432
+    # DB_NAME: str = "bni_tpl_2026"
+    # DB_USER: str = "postgres"
+    # DB_PASSWORD: str = "postgre123"
+    # DB_SCHEMA: str = "BNI_registration"
+
+
     # ── App ────────────────────────────────────────────────────────────────
     APP_ENV: str = "development"
     APP_HOST: str = "0.0.0.0"

@@ -93,7 +93,7 @@ def export_registrations_excel(db: Session) -> bytes:
             "Jersey Number": r.jersey_number,
             "Jersey Size": r.jersey_size,
             "Lower Size": r.lower_size,
-            "Photo URL": r.photo_url or "",
+            "Photo": r.photo_url if r.photo_url else "Not Uploaded",
             "Registered At": r.registered_at.strftime("%Y-%m-%d %H:%M:%S") if r.registered_at else "",
         }
         for r in registrations

@@ -13,6 +13,8 @@ from app.db.seed import seed_db
 BASE_DIR = Path(__file__).resolve().parent.parent  # → backend/
 UPLOAD_DIR = BASE_DIR / "uploads" / "photos"
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+NEWS_DIR = BASE_DIR / "uploads" / "news"
+NEWS_DIR.mkdir(parents=True, exist_ok=True)
 
 # Create tables (use Alembic in production)
 Base.metadata.create_all(bind=engine)

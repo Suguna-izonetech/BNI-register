@@ -188,3 +188,56 @@ class TeamStanding(BaseModel):
     no_result: int
     points: int
     nrr: float   # Net Run Rate
+
+# ── News / Blog Schemas ───────────────────────────────────────────────
+
+NEWS_CATEGORIES = ["news", "blog"]
+
+
+class NewsPostCreate(BaseModel):
+    title: str
+    category: str = "news"
+    content: str
+    excerpt: Optional[str] = None
+    author: str = "BNI-TPL Admin"
+    is_published: bool = True
+
+    @field_validator("title", "content")
+    @classmethod
+    def not_empty(cls, v: str) -> str:
+        if not v.strip():
+            raise ValueError("Field cannot be empty")
+        return v.strip()
+
+    @field_validator("category")
+    @classmethod
+    def valid_category(cls, v: str) -> str:
+        if v not in NEWS_CATEGORIES:
+            raise ValueError(f"category must be one of {NEWS_CATEGORIES}")
+        return v
+
+
+class NewsPostUpdate(BaseModel):
+    title: Optional[str] = None
+    category: Optional[str] = None
+    content: Optional[str] = None
+    excerpt: Optional[str] = None
+    author: Optional[str] = None
+    is_published: Optional[bool] = None
+
+
+class NewsPostResponse(BaseModel):
+    id: int
+    title: str
+    slug: str
+    category: str
+    content: str
+    excerpt: Optional[str] = None
+    image_url: Optional[str] = None
+    author: str
+    is_published: bool
+    published_at: datetime
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
