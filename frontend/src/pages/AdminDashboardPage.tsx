@@ -13,7 +13,7 @@ function photoSrc(url: string): string {
 }
 
 /** Deterministic colour from a string — cycles through a palette */
-const TEAM_COLOURS = [
+const TEAM_COLOURS: [string, string][] = [
   ['#d13b2a', '#9a2a1c'],
   ['#c9a84c', '#9a7a30'],
   ['#2d6a4f', '#1b4332'],
