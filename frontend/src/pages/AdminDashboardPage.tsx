@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { fetchRegistrations, fetchTeams, exportExcel, Registration, Team } from '../services/api';
+import * as XLSX from 'xlsx';
+import { fetchRegistrations, fetchTeams, Registration, Team } from '../services/api';
 import { useAuth } from '../hooks/useAuth';
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -35,7 +36,6 @@ export default function AdminDashboardPage() {
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [allTeams, setAllTeams] = useState<Team[]>([]);
   const [loading, setLoading] = useState(true);
-  const [exporting, setExporting] = useState(false);
   const [search, setSearch] = useState('');
   const [activeTeam, setActiveTeam] = useState<string | null>(null);
   const [lightbox, setLightbox] = useState<{ src: string; name: string } | null>(null);
@@ -58,16 +58,45 @@ export default function AdminDashboardPage() {
 
   const handleLogout = () => { logout(); navigate('/admin/login'); };
 
-  const handleExport = async () => {
-    setExporting(true);
-    try {
-      await exportExcel();
-      toast.success('Excel file downloaded!');
-    } catch {
-      toast.error('Export failed');
-    } finally {
-      setExporting(false);
-    }
+  /** Shared row mapper — same shape for both all-data and team exports */
+  const toExcelRows = (rows: Registration[]) =>
+    rows.map((r, i) => ({
+      '#': i + 1,
+      'Team Name': r.team_name,
+      'Player Name': r.player_name,
+      'Phone Number': r.phone_number,
+      'Jersey Name': r.jersey_name,
+      'Jersey Number': r.jersey_number,
+      'Jersey Size': r.jersey_size,
+      'Lower Size': r.lower_size,
+      'Photo': r.photo_url ?? 'Not Uploaded',
+      'Registered At': new Date(r.registered_at).toLocaleString('en-IN'),
+    }));
+
+  const buildAndDownload = (rows: Registration[], filename: string, sheetName: string) => {
+    const data = toExcelRows(rows);
+    if (data.length === 0) { toast.error('No registrations to export.'); return; }
+    const ws = XLSX.utils.json_to_sheet(data);
+    ws['!cols'] = Object.keys(data[0]).map((key) => ({
+      wch: Math.max(key.length, ...data.map((r) => String((r as Record<string, unknown>)[key] ?? '').length)) + 2,
+    }));
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, sheetName.slice(0, 31));
+    XLSX.writeFile(wb, filename);
+  };
+
+  /** Export all registrations client-side */
+  const handleExportAll = () => {
+    buildAndDownload(registrations, 'BNI_TPL_2026_All_Registrations.xlsx', 'All Players');
+    toast.success('Full Excel downloaded!');
+  };
+
+  /** Export only the active team's registrations */
+  const handleExportTeam = () => {
+    if (!activeTeam) return;
+    const teamRegs = registrations.filter((r) => r.team_name === activeTeam);
+    buildAndDownload(teamRegs, `BNI_TPL_2026_${activeTeam.replace(/\s+/g, '_')}.xlsx`, activeTeam);
+    toast.success(`${activeTeam} data exported!`);
   };
 
   const filtered = registrations.filter((r) => {
@@ -284,10 +313,9 @@ export default function AdminDashboardPage() {
             <button
               className="btn-primary"
               style={{ width: 'auto', padding: '0.6rem 1.5rem', marginTop: 0 }}
-              onClick={handleExport}
-              disabled={exporting}
+              onClick={activeTeam ? handleExportTeam : handleExportAll}
             >
-              {exporting ? 'Exporting...' : '⬇ Export Excel'}
+              {activeTeam ? `⬇ Export ${activeTeam}` : '⬇ Export All'}
             </button>
           </div>
         </div>
