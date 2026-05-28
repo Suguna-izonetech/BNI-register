@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 import Navbar from '../components/Navbar';
 import { fetchTeams, submitRegistration, Team } from '../services/api';
 
-const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL', '5XL', '6XL'];
 
 // Photo constraints
 const PHOTO_MAX_MB = 5;          // hard reject above this
@@ -118,6 +118,7 @@ export default function RegisterPage() {
     if (!form.jersey_name.trim()) e.jersey_name = 'Jersey name is required';
     if (!form.jersey_size) e.jersey_size = 'Please select jersey size';
     if (!form.lower_size) e.lower_size = 'Please select lower size';
+    if (!photoFile) e.photo = 'Player photo is required';
 
     const jn = parseInt(form.jersey_number);
     if (form.jersey_number === '') e.jersey_number = 'Jersey number is required';
@@ -330,11 +331,11 @@ export default function RegisterPage() {
 
               {/* Player Photo */}
               <div className="form-group full-width">
-                <label>Player Photo <span style={{ color: 'var(--charcoal-light)', fontWeight: 400, fontSize: '0.8rem' }}>(optional — JPEG / PNG / WebP, max 5 MB)</span></label>
+                <label>Player Photo <span className="required-star">*</span> <span style={{ color: 'var(--charcoal-light)', fontWeight: 400, fontSize: '0.8rem' }}>(JPEG / PNG / WebP, max 5 MB)</span></label>
 
                 {/* Drop zone / file picker */}
                 <div
-                  className={`photo-upload-zone${photoError ? ' error' : ''}${photoFile ? ' has-file' : ''}`}
+                  className={`photo-upload-zone${(photoError || errors.photo) ? ' error' : ''}${photoFile ? ' has-file' : ''}`}
                   onClick={() => !compressing && fileInputRef.current?.click()}
                   role="button"
                   tabIndex={0}
@@ -380,6 +381,7 @@ export default function RegisterPage() {
                 />
 
                 {photoError && <span className="error-msg">{photoError}</span>}
+                {!photoError && errors.photo && <span className="error-msg">{errors.photo}</span>}
               </div>
 
             </div>

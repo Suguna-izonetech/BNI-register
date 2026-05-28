@@ -110,7 +110,7 @@ export default function AdminDashboardPage() {
   const regMap = registrations.reduce<Record<string, { count: number; photos: string[] }>>((acc, r) => {
     if (!acc[r.team_name]) acc[r.team_name] = { count: 0, photos: [] };
     acc[r.team_name].count += 1;
-    if (r.photo_url && acc[r.team_name].photos.length < 3) acc[r.team_name].photos.push(r.photo_url);
+    if (r.photo_url && r.photo_url !== 'Not Uploaded' && acc[r.team_name].photos.length < 3) acc[r.team_name].photos.push(r.photo_url);
     return acc;
   }, {});
 
@@ -122,7 +122,7 @@ export default function AdminDashboardPage() {
     }))
     .sort((a, b) => a.name.localeCompare(b.name));
 
-  const withPhoto = registrations.filter((r) => r.photo_url).length;
+  const withPhoto = registrations.filter((r) => r.photo_url && r.photo_url !== 'Not Uploaded').length;
 
   return (
     <div className="admin-page">
@@ -353,7 +353,7 @@ export default function AdminDashboardPage() {
 
                     {/* Photo cell */}
                     <td style={{ padding: '0.5rem 0.75rem' }}>
-                      {r.photo_url ? (
+                      {r.photo_url && r.photo_url !== 'Not Uploaded' ? (
                         <span
                           title={r.photo_url}
                           onClick={() => setLightbox({ src: photoSrc(r.photo_url!), name: r.player_name })}

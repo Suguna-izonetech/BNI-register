@@ -23,8 +23,8 @@ class PlayerRegistration(Base):
     phone_number = Column(String(15), nullable=False)
     jersey_name = Column(String(100), nullable=False)
     jersey_number = Column(Integer, nullable=False)
-    jersey_size = Column(String(5), nullable=False)
-    lower_size = Column(String(5), nullable=False)
+    jersey_size = Column(String(10), nullable=False)
+    lower_size = Column(String(10), nullable=False)
     photo_url = Column(String(500), nullable=True)
     registered_at = Column(DateTime(timezone=True), server_default=func.now())
 

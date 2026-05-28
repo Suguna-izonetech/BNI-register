@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, File, Form, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
@@ -57,7 +57,7 @@ async def register_player(
     jersey_number: int = Form(...),
     jersey_size: str = Form(...),
     lower_size: str = Form(...),
-    photo: Optional[UploadFile] = File(None),
+    photo: UploadFile = File(...),
     db: Session = Depends(get_db),
 ):
     """Submit a player registration form (multipart/form-data)."""
@@ -74,6 +74,11 @@ async def register_player(
     photo_url: Optional[str] = None
     if photo and photo.filename:
         photo_url = await save_photo(photo)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Player photo is required.",
+        )
 
     create_registration(db, data, photo_url=photo_url)
     return {"message": "Registration successful! Welcome to BNI-TPL 2026."}

@@ -18,7 +18,7 @@ class TeamResponse(BaseModel):
 
 
 # ── Registration Schemas ─────────────────────────────────────────────
-JERSEY_SIZES = ["XS", "S", "M", "L", "XL", "XXL"]
+JERSEY_SIZES = ["XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL", "5XL", "6XL"]
 
 
 class PlayerRegistrationCreate(BaseModel):
