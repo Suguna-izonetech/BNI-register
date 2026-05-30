@@ -18,7 +18,7 @@ class TeamResponse(BaseModel):
 
 
 # ── Registration Schemas ─────────────────────────────────────────────
-JERSEY_SIZES = ["XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL", "5XL", "6XL"]
+JERSEY_SIZES = ["38", "40", "42", "44", "46", "48"]
 
 
 class PlayerRegistrationCreate(BaseModel):
@@ -48,9 +48,9 @@ class PlayerRegistrationCreate(BaseModel):
     @field_validator("jersey_size", "lower_size")
     @classmethod
     def validate_size(cls, v: str) -> str:
-        if v.upper() not in JERSEY_SIZES:
+        if v not in JERSEY_SIZES:
             raise ValueError(f"Size must be one of {JERSEY_SIZES}")
-        return v.upper()
+        return v
 
     @field_validator("player_name", "jersey_name", "team_name")
     @classmethod

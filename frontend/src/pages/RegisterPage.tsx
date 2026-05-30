@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 import Navbar from '../components/Navbar';
 import { fetchTeams, submitRegistration, Team } from '../services/api';
 
-const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL', '5XL', '6XL'];
+const SIZES = ['38', '40', '42', '44', '46', '48'];
 
 // Photo constraints
 const PHOTO_MAX_MB = 5;          // hard reject above this
