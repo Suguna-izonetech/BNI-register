@@ -102,10 +102,11 @@ class MessageResponse(BaseModel):
 
 
 class OneToOneRegistrationCreate(BaseModel):
+    team_name: str
     name: str
     phone_number: str
-    business_name: Optional[str] = None
-    business_category: Optional[str] = None
+    business_name: str
+    business_category: str
 
     @field_validator("phone_number")
     @classmethod
@@ -121,9 +122,17 @@ class OneToOneRegistrationCreate(BaseModel):
             )
         return f"+91{cleaned}"
 
+    @field_validator("team_name", "name", "business_name", "business_category")
+    @classmethod
+    def not_empty(cls, v: str) -> str:
+        if not v.strip():
+            raise ValueError("Field cannot be empty")
+        return v.strip()
+
 
 class OneToOneRegistrationResponse(BaseModel):
     id: int
+    team_name: Optional[str] = None
     name: str
     phone_number: str
     business_name: Optional[str] = None
@@ -136,11 +145,12 @@ class OneToOneRegistrationResponse(BaseModel):
 
 
 class FamilyRegistrationCreate(BaseModel):
+    team_name: str
     name: str
     phone_number: str
-    age_category: Optional[str] = None
-    business_name: Optional[str] = None
-    business_category: Optional[str] = None
+    age_category: str
+    business_name: str
+    business_category: str
 
     @field_validator("phone_number")
     @classmethod
@@ -156,9 +166,17 @@ class FamilyRegistrationCreate(BaseModel):
             )
         return f"+91{cleaned}"
 
+    @field_validator("team_name", "name", "age_category", "business_name", "business_category")
+    @classmethod
+    def not_empty(cls, v: str) -> str:
+        if not v.strip():
+            raise ValueError("Field cannot be empty")
+        return v.strip()
+
 
 class FamilyRegistrationResponse(BaseModel):
     id: int
+    team_name: Optional[str] = None
     name: str
     phone_number: str
     age_category: Optional[str] = None

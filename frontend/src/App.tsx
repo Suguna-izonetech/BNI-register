@@ -6,8 +6,6 @@ import HomePage from './pages/HomePage';
 import RegisterPage from './pages/RegisterPage';
 import OneToOneRegistrationPage from './pages/OneToOneRegistrationPage';
 import FamilyRegistrationPage from './pages/FamilyRegistrationPage';
-import PointsTablePage from './pages/PointsTablePage';
-import AdminLoginPage from './pages/AdminLoginPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -37,8 +35,6 @@ export default function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/register/one-to-one" element={<OneToOneRegistrationPage />} />
         <Route path="/register/family" element={<FamilyRegistrationPage />} />
-        <Route path="/points-table" element={<PointsTablePage />} />
-        <Route path="/admin/login" element={<AdminLoginPage />} />
         <Route
           path="/admin/dashboard"
           element={

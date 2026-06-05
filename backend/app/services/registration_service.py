@@ -81,7 +81,15 @@ def create_registration(
 
 
 def create_one_to_one(db: Session, data: OneToOneRegistrationCreate, photo_url: Optional[str] = None) -> OneToOneRegistration:
+    team = db.query(Team).filter(Team.name == data.team_name).first()
+    if not team:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Team '{data.team_name}' does not exist",
+        )
+
     reg = OneToOneRegistration(
+        team_name=data.team_name,
         name=data.name,
         phone_number=data.phone_number,
         business_name=data.business_name,
@@ -95,7 +103,15 @@ def create_one_to_one(db: Session, data: OneToOneRegistrationCreate, photo_url: 
 
 
 def create_family_registration(db: Session, data: FamilyRegistrationCreate, photo_url: Optional[str] = None) -> FamilyRegistration:
+    team = db.query(Team).filter(Team.name == data.team_name).first()
+    if not team:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Team '{data.team_name}' does not exist",
+        )
+
     reg = FamilyRegistration(
+        team_name=data.team_name,
         name=data.name,
         phone_number=data.phone_number,
         age_category=data.age_category,

@@ -29,19 +29,21 @@ export interface RegistrationPayload {
 }
 
 export interface OneToOnePayload {
+  team_name: string;
   name: string;
   phone_number: string;
-  business_name?: string | null;
-  business_category?: string | null;
+  business_name: string;
+  business_category: string;
   photo?: File | null;
 }
 
 export interface FamilyPayload {
+  team_name: string;
   name: string;
   phone_number: string;
-  age_category?: string | null;
-  business_name?: string | null;
-  business_category?: string | null;
+  age_category: string;
+  business_name: string;
+  business_category: string;
   photo?: File | null;
 }
 
@@ -77,21 +79,23 @@ export const submitRegistration = (data: RegistrationPayload): Promise<{ message
 
 export const submitOneToOne = (data: OneToOnePayload): Promise<{ message: string }> => {
   const fd = new FormData();
+  fd.append('team_name', data.team_name);
   fd.append('name', data.name);
   fd.append('phone_number', data.phone_number);
-  if (data.business_name) fd.append('business_name', data.business_name);
-  if (data.business_category) fd.append('business_category', data.business_category);
+  fd.append('business_name', data.business_name);
+  fd.append('business_category', data.business_category);
   if (data.photo) fd.append('photo', data.photo, data.photo.name);
   return api.post('/register/one-to-one', fd).then((r) => r.data);
 };
 
 export const submitFamily = (data: FamilyPayload): Promise<{ message: string }> => {
   const fd = new FormData();
+  fd.append('team_name', data.team_name);
   fd.append('name', data.name);
   fd.append('phone_number', data.phone_number);
-  if (data.age_category) fd.append('age_category', data.age_category);
-  if (data.business_name) fd.append('business_name', data.business_name);
-  if (data.business_category) fd.append('business_category', data.business_category);
+  fd.append('age_category', data.age_category);
+  fd.append('business_name', data.business_name);
+  fd.append('business_category', data.business_category);
   if (data.photo) fd.append('photo', data.photo, data.photo.name);
   return api.post('/register/family', fd).then((r) => r.data);
 };

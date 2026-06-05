@@ -34,6 +34,7 @@ class OneToOneRegistration(Base):
     __table_args__ = _schema
 
     id = Column(Integer, primary_key=True, index=True)
+    team_name = Column(String(100), nullable=True)
     name = Column(String(150), nullable=False)
     phone_number = Column(String(15), nullable=False)
     business_name = Column(String(200), nullable=True)
@@ -47,6 +48,7 @@ class FamilyRegistration(Base):
     __table_args__ = _schema
 
     id = Column(Integer, primary_key=True, index=True)
+    team_name = Column(String(100), nullable=True)
     name = Column(String(150), nullable=False)
     phone_number = Column(String(15), nullable=False)
     age_category = Column(String(50), nullable=True)

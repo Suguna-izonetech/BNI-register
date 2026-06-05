@@ -89,16 +89,17 @@ async def register_player(
 
 @router.post("/register/one-to-one", response_model=MessageResponse, status_code=201)
 async def register_one_to_one(
+        team_name: str = Form(...),
         name: str = Form(...),
         phone_number: str = Form(...),
-        business_name: Optional[str] = Form(None),
-        business_category: Optional[str] = Form(None),
+        business_name: str = Form(...),
+        business_category: str = Form(...),
         photo: UploadFile = File(...),
         db: Session = Depends(get_db),
 ):
         from app.schemas.schemas import OneToOneRegistrationCreate
 
-        data = OneToOneRegistrationCreate(name=name, phone_number=phone_number, business_name=business_name, business_category=business_category)
+        data = OneToOneRegistrationCreate(team_name=team_name, name=name, phone_number=phone_number, business_name=business_name, business_category=business_category)
         photo_url: Optional[str] = None
         if photo and photo.filename:
                 photo_url = await save_photo(photo)
@@ -111,17 +112,18 @@ async def register_one_to_one(
 
 @router.post("/register/family", response_model=MessageResponse, status_code=201)
 async def register_family(
+        team_name: str = Form(...),
         name: str = Form(...),
         phone_number: str = Form(...),
-        age_category: Optional[str] = Form(None),
-        business_name: Optional[str] = Form(None),
-        business_category: Optional[str] = Form(None),
+        age_category: str = Form(...),
+        business_name: str = Form(...),
+        business_category: str = Form(...),
         photo: UploadFile = File(...),
         db: Session = Depends(get_db),
 ):
         from app.schemas.schemas import FamilyRegistrationCreate
 
-        data = FamilyRegistrationCreate(name=name, phone_number=phone_number, age_category=age_category, business_name=business_name, business_category=business_category)
+        data = FamilyRegistrationCreate(team_name=team_name, name=name, phone_number=phone_number, age_category=age_category, business_name=business_name, business_category=business_category)
         photo_url: Optional[str] = None
         if photo and photo.filename:
                 photo_url = await save_photo(photo)
@@ -149,6 +151,7 @@ def admit_one_to_one(reg_id: int, db: Session = Depends(get_db)):
                 <div>{photo_html}</div>
                 <div>
                     <p><strong>Name:</strong> {reg.name}</p>
+                    <p><strong>Chapter:</strong> {reg.team_name or '-'}</p>
                     <p><strong>Phone:</strong> {reg.phone_number}</p>
                     <p><strong>Business:</strong> {reg.business_name or '-'}</p>
                     <p><strong>Category:</strong> {reg.business_category or '-'}</p>
@@ -176,6 +179,7 @@ def admit_family(reg_id: int, db: Session = Depends(get_db)):
                 <div>{photo_html}</div>
                 <div>
                     <p><strong>Name:</strong> {reg.name}</p>
+                    <p><strong>Chapter:</strong> {reg.team_name or '-'}</p>
                     <p><strong>Phone:</strong> {reg.phone_number}</p>
                     <p><strong>Age Category:</strong> {reg.age_category or '-'}</p>
                     <p><strong>Business:</strong> {reg.business_name or '-'}</p>

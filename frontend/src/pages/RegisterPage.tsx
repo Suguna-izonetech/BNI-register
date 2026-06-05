@@ -1,6 +1,7 @@
 import imageCompression from 'browser-image-compression';
 import { FormEvent, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { fetchTeams, submitRegistration, Team } from '../services/api';
 
@@ -11,6 +12,14 @@ const PHOTO_MAX_MB = 5;          // hard reject above this
 const PHOTO_TARGET_MB = 0.3;     // compress down to ~300 KB
 const PHOTO_ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const PHOTO_ALLOWED_EXT = '.jpg, .jpeg, .png, .webp';
+
+const fileToDataUrl = (file: File) =>
+  new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 
 interface FormData {
   team_name: string;
@@ -37,11 +46,13 @@ const INITIAL: FormData = {
 };
 
 export default function RegisterPage() {
+  const navigate = useNavigate();
   const [teams, setTeams] = useState<Team[]>([]);
   const [form, setForm] = useState<FormData>(INITIAL);
   const [errors, setErrors] = useState<Errors>({});
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submittedData, setSubmittedData] = useState<any>(null);
 
   // Photo state
   const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -87,10 +98,8 @@ export default function RegisterPage() {
         fileType: file.type as 'image/jpeg' | 'image/png' | 'image/webp',
       });
 
-      // Build preview URL
-      const previewUrl = URL.createObjectURL(compressed);
       setPhotoFile(compressed as File);
-      setPhotoPreview(previewUrl);
+      setPhotoPreview(await fileToDataUrl(compressed as File));
 
       const originalKB = (file.size / 1024).toFixed(0);
       const compressedKB = (compressed.size / 1024).toFixed(0);
@@ -161,6 +170,16 @@ export default function RegisterPage() {
         lower_size: form.lower_size,
         photo: photoFile,
       });
+      setSubmittedData({
+        team_name: form.team_name,
+        player_name: form.player_name.trim(),
+        phone_number: `+91${form.phone_number}`,
+        jersey_name: form.jersey_name.trim(),
+        jersey_number: form.jersey_number,
+        jersey_size: form.jersey_size,
+        lower_size: form.lower_size,
+        photo_url: photoPreview,
+      });
       setSubmitted(true);
       toast.success('Registration successful! Welcome to BNI-TPL 2026! 🏏');
     } catch (err: any) {
@@ -171,11 +190,83 @@ export default function RegisterPage() {
     }
   };
 
+  const downloadPDF = () => {
+    if (!submittedData) return;
+    const html = `
+      <!doctype html>
+      <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            .header { text-align: center; margin-bottom: 30px; }
+            .header h1 { color: #c9a84c; margin: 0; }
+            .header p { color: #666; margin: 5px 0; }
+            .section { margin-bottom: 20px; }
+            .section h3 { color: #2d2d2d; border-bottom: 2px solid #c9a84c; padding-bottom: 5px; }
+            .field { margin: 10px 0; }
+            .label { font-weight: bold; color: #333; }
+            .value { color: #666; margin-left: 10px; }
+            .admit-details { display: flex; gap: 24px; align-items: flex-start; margin-bottom: 20px; }
+            .admit-photo { width: 140px; height: 170px; object-fit: cover; border: 2px solid #c9a84c; border-radius: 8px; }
+            .admit-fields { flex: 1; }
+            .footer { text-align: center; color: #999; font-size: 12px; margin-top: 40px; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>BNI - TPL 2026</h1>
+            <p>Player Registration Admit Card</p>
+          </div>
+          <div class="admit-details">
+            ${submittedData.photo_url ? `<img class="admit-photo" src="${submittedData.photo_url}" alt="Registered photo" />` : ''}
+            <div class="admit-fields">
+              <div class="section">
+                <h3>Player Details</h3>
+                <div class="field"><span class="label">Chapter:</span><span class="value">${submittedData.team_name}</span></div>
+                <div class="field"><span class="label">Player Name:</span><span class="value">${submittedData.player_name}</span></div>
+                <div class="field"><span class="label">Phone Number:</span><span class="value">${submittedData.phone_number}</span></div>
+              </div>
+              <div class="section">
+                <h3>Jersey Details</h3>
+                <div class="field"><span class="label">Jersey Name:</span><span class="value">${submittedData.jersey_name}</span></div>
+                <div class="field"><span class="label">Jersey Number:</span><span class="value">${submittedData.jersey_number}</span></div>
+                <div class="field"><span class="label">Jersey Size:</span><span class="value">${submittedData.jersey_size}</span></div>
+                <div class="field"><span class="label">Lower Size:</span><span class="value">${submittedData.lower_size}</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="footer"><p>Registration submitted successfully!</p><p>Date: ${new Date().toLocaleString()}</p></div>
+        </body>
+      </html>
+    `;
+    const printWindow = window.open('', '_blank', 'height=700,width=900');
+    if (!printWindow) {
+      toast.error('Please allow pop-ups to download the admit card');
+      return;
+    }
+    printWindow.document.open();
+    printWindow.document.write(html);
+    printWindow.document.close();
+    printWindow.focus();
+
+    let printed = false;
+    const printWhenReady = () => {
+      if (printed) return;
+      printed = true;
+      setTimeout(() => printWindow.print(), 300);
+    };
+    printWindow.onload = printWhenReady;
+    setTimeout(printWhenReady, 800);
+  };
+
   if (submitted) {
     return (
       <>
         <Navbar />
         <div className="page-header">
+          <button className="btn-secondary" onClick={() => navigate('/')} style={{ marginBottom: '0.75rem', color: 'var(--white)', borderColor: 'var(--white)' }}>
+            ← Back to Home
+          </button>
           <h1>REGISTRATION</h1>
         </div>
         <div className="form-container">
@@ -187,13 +278,18 @@ export default function RegisterPage() {
             <p style={{ color: 'var(--charcoal-light)', marginBottom: '2rem', lineHeight: 1.6 }}>
               Welcome to <strong>BNI – TPL 2026</strong>! Your registration has been submitted. See you on the field! 🎉
             </p>
-            <button
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <button className="btn-primary" style={{ width: 'auto', padding: '0.75rem 2.5rem' }} onClick={downloadPDF}>
+                DOWNLOAD AS PDF
+              </button>
+              <button
               className="btn-primary"
               style={{ width: 'auto', padding: '0.75rem 2.5rem' }}
-              onClick={() => { setForm(INITIAL); setSubmitted(false); setErrors({}); clearPhoto(); }}
+              onClick={() => { setForm(INITIAL); setSubmitted(false); setSubmittedData(null); setErrors({}); clearPhoto(); }}
             >
-              REGISTER ANOTHER PLAYER
-            </button>
+              ➕ REGISTER ANOTHER PLAYER
+              </button>
+            </div>
           </div>
         </div>
       </>
@@ -204,6 +300,9 @@ export default function RegisterPage() {
     <>
       <Navbar />
       <div className="page-header">
+        <button className="btn-secondary" onClick={() => navigate('/')} style={{ marginBottom: '0.75rem', color: 'var(--white)', borderColor: 'var(--white)' }}>
+          ← Back to Home
+        </button>
         <h1>PLAYER REGISTRATION</h1>
       </div>
 
