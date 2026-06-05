@@ -9,6 +9,8 @@ from sqlalchemy.orm import Session
 
 from app.models.models import PlayerRegistration, Team
 from app.schemas.schemas import PlayerRegistrationCreate
+from app.models.models import OneToOneRegistration, FamilyRegistration
+from app.schemas.schemas import OneToOneRegistrationCreate, FamilyRegistrationCreate
 
 # Resolve uploads relative to this file so it always lands inside backend/
 BASE_DIR = Path(__file__).resolve().parent.parent.parent  # → backend/
@@ -76,6 +78,35 @@ def create_registration(
     db.commit()
     db.refresh(registration)
     return registration
+
+
+def create_one_to_one(db: Session, data: OneToOneRegistrationCreate, photo_url: Optional[str] = None) -> OneToOneRegistration:
+    reg = OneToOneRegistration(
+        name=data.name,
+        phone_number=data.phone_number,
+        business_name=data.business_name,
+        business_category=data.business_category,
+        photo_url=photo_url,
+    )
+    db.add(reg)
+    db.commit()
+    db.refresh(reg)
+    return reg
+
+
+def create_family_registration(db: Session, data: FamilyRegistrationCreate, photo_url: Optional[str] = None) -> FamilyRegistration:
+    reg = FamilyRegistration(
+        name=data.name,
+        phone_number=data.phone_number,
+        age_category=data.age_category,
+        business_name=data.business_name,
+        business_category=data.business_category,
+        photo_url=photo_url,
+    )
+    db.add(reg)
+    db.commit()
+    db.refresh(reg)
+    return reg
 
 
 def get_all_registrations(db: Session):

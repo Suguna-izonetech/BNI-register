@@ -1,6 +1,7 @@
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
+from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
@@ -13,6 +14,7 @@ from app.schemas.schemas import (
     NewsPostResponse,
 )
 from app.services.registration_service import create_registration, get_all_teams, save_photo
+from app.services.registration_service import create_one_to_one, create_family_registration
 from app.services.match_service import get_all_matches, get_standings
 from app.services.news_service import get_all_posts, get_post_by_slug
 
@@ -82,3 +84,105 @@ async def register_player(
 
     create_registration(db, data, photo_url=photo_url)
     return {"message": "Registration successful! Welcome to BNI-TPL 2026."}
+
+
+
+@router.post("/register/one-to-one", response_model=MessageResponse, status_code=201)
+async def register_one_to_one(
+        name: str = Form(...),
+        phone_number: str = Form(...),
+        business_name: Optional[str] = Form(None),
+        business_category: Optional[str] = Form(None),
+        photo: UploadFile = File(...),
+        db: Session = Depends(get_db),
+):
+        from app.schemas.schemas import OneToOneRegistrationCreate
+
+        data = OneToOneRegistrationCreate(name=name, phone_number=phone_number, business_name=business_name, business_category=business_category)
+        photo_url: Optional[str] = None
+        if photo and photo.filename:
+                photo_url = await save_photo(photo)
+        else:
+                raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Photo is required for one-to-one registration.")
+
+        reg = create_one_to_one(db, data, photo_url=photo_url)
+        return {"message": f"One-to-one registration successful. Admit card: /admit/one-to-one/{reg.id}"}
+
+
+@router.post("/register/family", response_model=MessageResponse, status_code=201)
+async def register_family(
+        name: str = Form(...),
+        phone_number: str = Form(...),
+        age_category: Optional[str] = Form(None),
+        business_name: Optional[str] = Form(None),
+        business_category: Optional[str] = Form(None),
+        photo: UploadFile = File(...),
+        db: Session = Depends(get_db),
+):
+        from app.schemas.schemas import FamilyRegistrationCreate
+
+        data = FamilyRegistrationCreate(name=name, phone_number=phone_number, age_category=age_category, business_name=business_name, business_category=business_category)
+        photo_url: Optional[str] = None
+        if photo and photo.filename:
+                photo_url = await save_photo(photo)
+        else:
+                raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Photo is required for family registration.")
+
+        reg = create_family_registration(db, data, photo_url=photo_url)
+        return {"message": f"Family registration successful. Admit card: /admit/family/{reg.id}"}
+
+
+
+@router.get("/admit/one-to-one/{reg_id}", response_class=HTMLResponse)
+def admit_one_to_one(reg_id: int, db: Session = Depends(get_db)):
+        from app.models.models import OneToOneRegistration
+
+        reg = db.query(OneToOneRegistration).filter(OneToOneRegistration.id == reg_id).first()
+        if not reg:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Registration not found")
+
+        photo_html = f'<img src="{reg.photo_url}" alt="photo" style="max-width:140px;border-radius:8px;" />' if reg.photo_url else ''
+        html = f"""
+        <html><body style="font-family: Arial, Helvetica, sans-serif; padding: 2rem;">
+            <h2>BNI-TPL 2026 — Admit Card (One-to-One)</h2>
+            <div style="display:flex;gap:2rem;align-items:center;margin-top:1rem;">
+                <div>{photo_html}</div>
+                <div>
+                    <p><strong>Name:</strong> {reg.name}</p>
+                    <p><strong>Phone:</strong> {reg.phone_number}</p>
+                    <p><strong>Business:</strong> {reg.business_name or '-'}</p>
+                    <p><strong>Category:</strong> {reg.business_category or '-'}</p>
+                </div>
+            </div>
+            <p style="margin-top:2rem;color:#666;">Present this admit card at registration desk.</p>
+        </body></html>
+        """
+        return HTMLResponse(content=html)
+
+
+@router.get("/admit/family/{reg_id}", response_class=HTMLResponse)
+def admit_family(reg_id: int, db: Session = Depends(get_db)):
+        from app.models.models import FamilyRegistration
+
+        reg = db.query(FamilyRegistration).filter(FamilyRegistration.id == reg_id).first()
+        if not reg:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Registration not found")
+
+        photo_html = f'<img src="{reg.photo_url}" alt="photo" style="max-width:140px;border-radius:8px;" />' if reg.photo_url else ''
+        html = f"""
+        <html><body style="font-family: Arial, Helvetica, sans-serif; padding: 2rem;">
+            <h2>BNI-TPL 2026 — Admit Card (Family)</h2>
+            <div style="display:flex;gap:2rem;align-items:center;margin-top:1rem;">
+                <div>{photo_html}</div>
+                <div>
+                    <p><strong>Name:</strong> {reg.name}</p>
+                    <p><strong>Phone:</strong> {reg.phone_number}</p>
+                    <p><strong>Age Category:</strong> {reg.age_category or '-'}</p>
+                    <p><strong>Business:</strong> {reg.business_name or '-'}</p>
+                    <p><strong>Category:</strong> {reg.business_category or '-'}</p>
+                </div>
+            </div>
+            <p style="margin-top:2rem;color:#666;">Present this admit card at registration desk.</p>
+        </body></html>
+        """
+        return HTMLResponse(content=html)

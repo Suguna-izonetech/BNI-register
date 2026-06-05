@@ -28,6 +28,23 @@ export interface RegistrationPayload {
   photo?: File | null;
 }
 
+export interface OneToOnePayload {
+  name: string;
+  phone_number: string;
+  business_name?: string | null;
+  business_category?: string | null;
+  photo?: File | null;
+}
+
+export interface FamilyPayload {
+  name: string;
+  phone_number: string;
+  age_category?: string | null;
+  business_name?: string | null;
+  business_category?: string | null;
+  photo?: File | null;
+}
+
 export interface Registration {
   id: number;
   team_name: string;
@@ -56,6 +73,27 @@ export const submitRegistration = (data: RegistrationPayload): Promise<{ message
   fd.append('lower_size', data.lower_size);
   if (data.photo) fd.append('photo', data.photo, data.photo.name);
   return api.post('/register', fd).then((r) => r.data);
+};
+
+export const submitOneToOne = (data: OneToOnePayload): Promise<{ message: string }> => {
+  const fd = new FormData();
+  fd.append('name', data.name);
+  fd.append('phone_number', data.phone_number);
+  if (data.business_name) fd.append('business_name', data.business_name);
+  if (data.business_category) fd.append('business_category', data.business_category);
+  if (data.photo) fd.append('photo', data.photo, data.photo.name);
+  return api.post('/register/one-to-one', fd).then((r) => r.data);
+};
+
+export const submitFamily = (data: FamilyPayload): Promise<{ message: string }> => {
+  const fd = new FormData();
+  fd.append('name', data.name);
+  fd.append('phone_number', data.phone_number);
+  if (data.age_category) fd.append('age_category', data.age_category);
+  if (data.business_name) fd.append('business_name', data.business_name);
+  if (data.business_category) fd.append('business_category', data.business_category);
+  if (data.photo) fd.append('photo', data.photo, data.photo.name);
+  return api.post('/register/family', fd).then((r) => r.data);
 };
 
 // ── Admin APIs ────────────────────────────────────────────────────

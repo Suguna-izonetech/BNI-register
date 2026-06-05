@@ -14,8 +14,11 @@ export default function Navbar() {
       {/* Desktop links */}
       <ul className="navbar-links">
         <li><NavLink to="/" end>Home</NavLink></li>
-        <li><NavLink to="/register">Register</NavLink></li>
+        <li><NavLink to="/register" end>Player Register</NavLink></li>
+        <li><NavLink to="/register/one-to-one" end>One-to-One</NavLink></li>
+        <li><NavLink to="/register/family" end>Spouse & Kids</NavLink></li>
       </ul>
+
 
       {/* Desktop CTA */}
       <NavLink to="/register" className="btn-register navbar-cta">
@@ -36,7 +39,9 @@ export default function Navbar() {
       {menuOpen && (
         <div className="mobile-menu">
           <NavLink to="/" end onClick={() => setMenuOpen(false)}>Home</NavLink>
-          <NavLink to="/register" onClick={() => setMenuOpen(false)}>Register</NavLink>
+          <NavLink to="/register" end onClick={() => setMenuOpen(false)}>Player</NavLink>
+          <NavLink to="/register/one-to-one" onClick={() => setMenuOpen(false)}>One-to-One</NavLink>
+          <NavLink to="/register/family" onClick={() => setMenuOpen(false)}>Spouse & Kids</NavLink>
         </div>
       )}
     </nav>

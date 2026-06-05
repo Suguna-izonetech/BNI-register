@@ -11,11 +11,11 @@ class Settings(BaseSettings):
     )
 
     # ── Database ───────────────────────────────────────────────────────────
-    DB_HOST: str = "72.62.198.6"
+    DB_HOST: str = "localhost"
     DB_PORT: int = 5432
-    DB_NAME: str = "izone_db"
-    DB_USER: str = "data_admin"
-    DB_PASSWORD: str = "qqssxx&234#Tc"
+    DB_NAME: str = "db_registration"
+    DB_USER: str = "postgres"
+    DB_PASSWORD: str = "postgre@123"
     DB_SCHEMA: str = "BNI_registration"
 
     # DB_HOST: str = "localhost"

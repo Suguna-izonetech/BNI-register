@@ -22,8 +22,7 @@ def set_search_path(dbapi_conn, connection_record):
 
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
-Base.metadata.schema = DB_SCHEMA   # all models default to this schema
+Base = declarative_base() # all models default to this schema
 
 
 def get_db():

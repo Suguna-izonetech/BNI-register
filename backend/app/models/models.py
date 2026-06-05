@@ -29,6 +29,33 @@ class PlayerRegistration(Base):
     registered_at = Column(DateTime(timezone=True), server_default=func.now())
 
 
+class OneToOneRegistration(Base):
+    __tablename__ = "one_to_one_registrations"
+    __table_args__ = _schema
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(150), nullable=False)
+    phone_number = Column(String(15), nullable=False)
+    business_name = Column(String(200), nullable=True)
+    business_category = Column(String(100), nullable=True)
+    photo_url = Column(String(500), nullable=True)
+    registered_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class FamilyRegistration(Base):
+    __tablename__ = "family_registrations"
+    __table_args__ = _schema
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(150), nullable=False)
+    phone_number = Column(String(15), nullable=False)
+    age_category = Column(String(50), nullable=True)
+    business_name = Column(String(200), nullable=True)
+    business_category = Column(String(100), nullable=True)
+    photo_url = Column(String(500), nullable=True)
+    registered_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
 class Match(Base):
     __tablename__ = "matches"
     __table_args__ = _schema

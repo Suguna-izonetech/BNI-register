@@ -98,6 +98,79 @@ class MessageResponse(BaseModel):
     message: str
 
 
+# ── One-to-One / Family Registration Schemas ─────────────────────
+
+
+class OneToOneRegistrationCreate(BaseModel):
+    name: str
+    phone_number: str
+    business_name: Optional[str] = None
+    business_category: Optional[str] = None
+
+    @field_validator("phone_number")
+    @classmethod
+    def validate_phone(cls, v: str) -> str:
+        cleaned = v.strip()
+        if cleaned.startswith("+91"):
+            cleaned = cleaned[3:].strip()
+        elif cleaned.startswith("91") and len(cleaned) == 12:
+            cleaned = cleaned[2:]
+        if not re.fullmatch(r"[6-9]\d{9}", cleaned):
+            raise ValueError(
+                "Phone number must be a valid Indian mobile number (10 digits starting with 6-9)"
+            )
+        return f"+91{cleaned}"
+
+
+class OneToOneRegistrationResponse(BaseModel):
+    id: int
+    name: str
+    phone_number: str
+    business_name: Optional[str] = None
+    business_category: Optional[str] = None
+    photo_url: Optional[str] = None
+    registered_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class FamilyRegistrationCreate(BaseModel):
+    name: str
+    phone_number: str
+    age_category: Optional[str] = None
+    business_name: Optional[str] = None
+    business_category: Optional[str] = None
+
+    @field_validator("phone_number")
+    @classmethod
+    def validate_phone(cls, v: str) -> str:
+        cleaned = v.strip()
+        if cleaned.startswith("+91"):
+            cleaned = cleaned[3:].strip()
+        elif cleaned.startswith("91") and len(cleaned) == 12:
+            cleaned = cleaned[2:]
+        if not re.fullmatch(r"[6-9]\d{9}", cleaned):
+            raise ValueError(
+                "Phone number must be a valid Indian mobile number (10 digits starting with 6-9)"
+            )
+        return f"+91{cleaned}"
+
+
+class FamilyRegistrationResponse(BaseModel):
+    id: int
+    name: str
+    phone_number: str
+    age_category: Optional[str] = None
+    business_name: Optional[str] = None
+    business_category: Optional[str] = None
+    photo_url: Optional[str] = None
+    registered_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
 # ── Match Schemas ─────────────────────────────────────────────────────
 
 MATCH_STAGES = ["league", "quarter_final", "semi_final", "final"]

@@ -21,7 +21,7 @@ build/
 .Python
 
 # ── Virtual environments ─────────────────
-bni_venv/
+bnivenv/
 venv/
 env/
 .venv/
