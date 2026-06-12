@@ -60,6 +60,29 @@ export interface Registration {
   registered_at: string;
 }
 
+export interface OneToOneRegistration {
+  id: number;
+  team_name: string | null;
+  name: string;
+  phone_number: string;
+  business_name: string | null;
+  business_category: string | null;
+  photo_url?: string | null;
+  registered_at: string;
+}
+
+export interface FamilyRegistration {
+  id: number;
+  team_name: string | null;
+  name: string;
+  phone_number: string;
+  age_category: string | null;
+  business_name: string | null;
+  business_category: string | null;
+  photo_url?: string | null;
+  registered_at: string;
+}
+
 // ── Public APIs ───────────────────────────────────────────────────
 export const fetchTeams = (): Promise<Team[]> =>
   api.get('/teams').then((r) => r.data);
@@ -107,22 +130,37 @@ export const adminLogin = (username: string, password: string): Promise<{ access
 export const fetchRegistrations = (): Promise<Registration[]> =>
   api.get('/admin/registrations').then((r) => r.data);
 
-export const exportExcel = async () => {
+export const fetchOneToOneRegistrations = (): Promise<OneToOneRegistration[]> =>
+  api.get('/admin/one-to-one').then((r) => r.data);
+
+export const fetchFamilyRegistrations = (): Promise<FamilyRegistration[]> =>
+  api.get('/admin/family').then((r) => r.data);
+
+const downloadFile = async (url: string, filename: string) => {
   const token = localStorage.getItem('admin_token');
-  const response = await fetch(`${BASE_URL}/admin/export`, {
+  const response = await fetch(`${BASE_URL}${url}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!response.ok) throw new Error('Export failed');
   const blob = await response.blob();
-  const url = window.URL.createObjectURL(blob);
+  const objectUrl = window.URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url;
-  a.download = 'BNI_TPL_2026_Registrations.xlsx';
+  a.href = objectUrl;
+  a.download = filename;
   document.body.appendChild(a);
   a.click();
   a.remove();
-  window.URL.revokeObjectURL(url);
+  window.URL.revokeObjectURL(objectUrl);
 };
+
+export const exportExcel = () =>
+  downloadFile('/admin/export', 'BNI_TPL_2026_Registrations.xlsx');
+
+export const exportOneToOneExcel = () =>
+  downloadFile('/admin/one-to-one/export', 'BNI_TPL_2026_OneToOne.xlsx');
+
+export const exportFamilyExcel = () =>
+  downloadFile('/admin/family/export', 'BNI_TPL_2026_Family.xlsx');
 
 // ── Points Table / Matches ────────────────────────────────────────
 export interface TeamStanding {

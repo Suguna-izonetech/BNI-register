@@ -129,6 +129,65 @@ def get_all_registrations(db: Session):
     return db.query(PlayerRegistration).order_by(PlayerRegistration.registered_at.desc()).all()
 
 
+def get_all_one_to_one(db: Session):
+    return db.query(OneToOneRegistration).order_by(OneToOneRegistration.registered_at.desc()).all()
+
+
+def get_all_family(db: Session):
+    return db.query(FamilyRegistration).order_by(FamilyRegistration.registered_at.desc()).all()
+
+
+def export_one_to_one_excel(db: Session) -> bytes:
+    records = get_all_one_to_one(db)
+    data = [
+        {
+            "Chapter": r.team_name or "",
+            "Name": r.name,
+            "Phone Number": r.phone_number,
+            "Business Name": r.business_name or "",
+            "Business Category": r.business_category or "",
+            "Photo": r.photo_url if r.photo_url else "Not Uploaded",
+            "Registered At": r.registered_at.strftime("%Y-%m-%d %H:%M:%S") if r.registered_at else "",
+        }
+        for r in records
+    ]
+    df = pd.DataFrame(data)
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine="openpyxl") as writer:
+        df.to_excel(writer, index=False, sheet_name="One-To-One")
+        worksheet = writer.sheets["One-To-One"]
+        for col in worksheet.columns:
+            max_len = max((len(str(cell.value or "")) for cell in col), default=10)
+            worksheet.column_dimensions[col[0].column_letter].width = min(max_len + 4, 40)
+    return output.getvalue()
+
+
+def export_family_excel(db: Session) -> bytes:
+    records = get_all_family(db)
+    data = [
+        {
+            "Chapter": r.team_name or "",
+            "Name": r.name,
+            "Phone Number": r.phone_number,
+            "Age Category": r.age_category or "",
+            "Business Name": r.business_name or "",
+            "Business Category": r.business_category or "",
+            "Photo": r.photo_url if r.photo_url else "Not Uploaded",
+            "Registered At": r.registered_at.strftime("%Y-%m-%d %H:%M:%S") if r.registered_at else "",
+        }
+        for r in records
+    ]
+    df = pd.DataFrame(data)
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine="openpyxl") as writer:
+        df.to_excel(writer, index=False, sheet_name="Family")
+        worksheet = writer.sheets["Family"]
+        for col in worksheet.columns:
+            max_len = max((len(str(cell.value or "")) for cell in col), default=10)
+            worksheet.column_dimensions[col[0].column_letter].width = min(max_len + 4, 40)
+    return output.getvalue()
+
+
 def export_registrations_excel(db: Session) -> bytes:
     registrations = get_all_registrations(db)
     data = [

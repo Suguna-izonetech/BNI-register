@@ -8,12 +8,18 @@ from app.db.database import get_db
 from app.schemas.schemas import (
     AdminLogin, Token,
     PlayerRegistrationResponse,
+    OneToOneRegistrationResponse,
+    FamilyRegistrationResponse,
     MatchCreate, MatchResultUpdate, MatchResponse,
     NewsPostCreate, NewsPostUpdate, NewsPostResponse,
 )
 from app.core.security import create_access_token, get_current_admin
 from app.core.config import settings
-from app.services.registration_service import get_all_registrations, export_registrations_excel
+from app.services.registration_service import (
+    get_all_registrations, export_registrations_excel,
+    get_all_one_to_one, export_one_to_one_excel,
+    get_all_family, export_family_excel,
+)
 from app.services.match_service import (
     create_match, update_match_result, delete_match, get_all_matches,
 )
@@ -50,12 +56,62 @@ def export_excel(
     db: Session = Depends(get_db),
     current_admin: str = Depends(get_current_admin),
 ):
-    """Export all registrations as Excel (admin only)."""
+    """Export all player registrations as Excel (admin only)."""
     excel_bytes = export_registrations_excel(db)
     return StreamingResponse(
         io.BytesIO(excel_bytes),
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         headers={"Content-Disposition": "attachment; filename=BNI_TPL_2026_Registrations.xlsx"},
+    )
+
+
+# ── One-to-One Registration Admin ─────────────────────────────────────
+
+@router.get("/one-to-one", response_model=List[OneToOneRegistrationResponse])
+def list_one_to_one(
+    db: Session = Depends(get_db),
+    current_admin: str = Depends(get_current_admin),
+):
+    """Fetch all one-to-one registrations (admin only)."""
+    return get_all_one_to_one(db)
+
+
+@router.get("/one-to-one/export")
+def export_one_to_one(
+    db: Session = Depends(get_db),
+    current_admin: str = Depends(get_current_admin),
+):
+    """Export all one-to-one registrations as Excel (admin only)."""
+    excel_bytes = export_one_to_one_excel(db)
+    return StreamingResponse(
+        io.BytesIO(excel_bytes),
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": "attachment; filename=BNI_TPL_2026_OneToOne.xlsx"},
+    )
+
+
+# ── Family Registration Admin ──────────────────────────────────────────
+
+@router.get("/family", response_model=List[FamilyRegistrationResponse])
+def list_family(
+    db: Session = Depends(get_db),
+    current_admin: str = Depends(get_current_admin),
+):
+    """Fetch all family registrations (admin only)."""
+    return get_all_family(db)
+
+
+@router.get("/family/export")
+def export_family(
+    db: Session = Depends(get_db),
+    current_admin: str = Depends(get_current_admin),
+):
+    """Export all family registrations as Excel (admin only)."""
+    excel_bytes = export_family_excel(db)
+    return StreamingResponse(
+        io.BytesIO(excel_bytes),
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": "attachment; filename=BNI_TPL_2026_Family.xlsx"},
     )
 
 
