@@ -6,7 +6,7 @@ TEAMS = [
     "Azpire", "Benchmark", "Champions", "Dynamic", "EMPEROR",
     "FORTUNE", "GLADIATORS", "HARMONY", "ICONS", "JAAGUAR",
     "KINGS", "Legends", "Millionaire", "Nest", "PRINCE",
-    "SPARK", "OSCAR", "TYCOON", "ROYALS", "WARRIORS",
+    "SPARK", "OSCAR", "VICTORY", "ROYALS", "WARRIORS",
 ]
 
 
