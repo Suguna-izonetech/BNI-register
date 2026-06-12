@@ -32,9 +32,6 @@ ENV/
 alembic/__pycache__/
 alembic/versions/__pycache__/
 
-# ── Uploads (user photos) ────────────────
-backend/uploads/
-
 # ── Node / Frontend ──────────────────────
 node_modules/
 frontend/node_modules/
