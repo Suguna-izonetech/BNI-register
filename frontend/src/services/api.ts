@@ -42,8 +42,9 @@ export interface FamilyPayload {
   name: string;
   phone_number: string;
   age_category: string;
-  business_name: string;
-  business_category: string;
+  member_name: string;
+  spouse_kids_name: string;
+  selected_game: string;
   photo?: File | null;
 }
 
@@ -77,8 +78,9 @@ export interface FamilyRegistration {
   name: string;
   phone_number: string;
   age_category: string | null;
-  business_name: string | null;
-  business_category: string | null;
+  member_name: string | null;
+  spouse_kids_name: string | null;
+  selected_game: string | null;
   photo_url?: string | null;
   registered_at: string;
 }
@@ -117,8 +119,9 @@ export const submitFamily = (data: FamilyPayload): Promise<{ message: string }> 
   fd.append('name', data.name);
   fd.append('phone_number', data.phone_number);
   fd.append('age_category', data.age_category);
-  fd.append('business_name', data.business_name);
-  fd.append('business_category', data.business_category);
+  fd.append('member_name', data.member_name);
+  fd.append('spouse_kids_name', data.spouse_kids_name);
+  fd.append('selected_game', data.selected_game);
   if (data.photo) fd.append('photo', data.photo, data.photo.name);
   return api.post('/register/family', fd).then((r) => r.data);
 };

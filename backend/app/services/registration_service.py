@@ -115,8 +115,9 @@ def create_family_registration(db: Session, data: FamilyRegistrationCreate, phot
         name=data.name,
         phone_number=data.phone_number,
         age_category=data.age_category,
-        business_name=data.business_name,
-        business_category=data.business_category,
+        member_name=data.member_name,
+        spouse_kids_name=data.spouse_kids_name,
+        selected_game=data.selected_game,
         photo_url=photo_url,
     )
     db.add(reg)
@@ -170,8 +171,9 @@ def export_family_excel(db: Session) -> bytes:
             "Name": r.name,
             "Phone Number": r.phone_number,
             "Age Category": r.age_category or "",
-            "Business Name": r.business_name or "",
-            "Business Category": r.business_category or "",
+            "Member Name": r.member_name or "",
+            "Spouse / Kids Name": r.spouse_kids_name or "",
+            "Selected Game": r.selected_game or "",
             "Photo": r.photo_url if r.photo_url else "Not Uploaded",
             "Registered At": r.registered_at.strftime("%Y-%m-%d %H:%M:%S") if r.registered_at else "",
         }

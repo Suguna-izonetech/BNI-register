@@ -149,8 +149,9 @@ class FamilyRegistrationCreate(BaseModel):
     name: str
     phone_number: str
     age_category: str
-    business_name: str
-    business_category: str
+    member_name: str
+    spouse_kids_name: str
+    selected_game: str
 
     @field_validator("phone_number")
     @classmethod
@@ -166,7 +167,7 @@ class FamilyRegistrationCreate(BaseModel):
             )
         return f"+91{cleaned}"
 
-    @field_validator("team_name", "name", "age_category", "business_name", "business_category")
+    @field_validator("team_name", "name", "age_category", "member_name", "spouse_kids_name", "selected_game")
     @classmethod
     def not_empty(cls, v: str) -> str:
         if not v.strip():
@@ -180,8 +181,9 @@ class FamilyRegistrationResponse(BaseModel):
     name: str
     phone_number: str
     age_category: Optional[str] = None
-    business_name: Optional[str] = None
-    business_category: Optional[str] = None
+    member_name: Optional[str] = None
+    spouse_kids_name: Optional[str] = None
+    selected_game: Optional[str] = None
     photo_url: Optional[str] = None
     registered_at: datetime
 

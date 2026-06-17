@@ -116,14 +116,23 @@ async def register_family(
         name: str = Form(...),
         phone_number: str = Form(...),
         age_category: str = Form(...),
-        business_name: str = Form(...),
-        business_category: str = Form(...),
+        member_name: str = Form(...),
+        spouse_kids_name: str = Form(...),
+        selected_game: str = Form(...),
         photo: UploadFile = File(...),
         db: Session = Depends(get_db),
 ):
         from app.schemas.schemas import FamilyRegistrationCreate
 
-        data = FamilyRegistrationCreate(team_name=team_name, name=name, phone_number=phone_number, age_category=age_category, business_name=business_name, business_category=business_category)
+        data = FamilyRegistrationCreate(
+            team_name=team_name,
+            name=name,
+            phone_number=phone_number,
+            age_category=age_category,
+            member_name=member_name,
+            spouse_kids_name=spouse_kids_name,
+            selected_game=selected_game,
+        )
         photo_url: Optional[str] = None
         if photo and photo.filename:
                 photo_url = await save_photo(photo)
@@ -182,8 +191,9 @@ def admit_family(reg_id: int, db: Session = Depends(get_db)):
                     <p><strong>Chapter:</strong> {reg.team_name or '-'}</p>
                     <p><strong>Phone:</strong> {reg.phone_number}</p>
                     <p><strong>Age Category:</strong> {reg.age_category or '-'}</p>
-                    <p><strong>Business:</strong> {reg.business_name or '-'}</p>
-                    <p><strong>Category:</strong> {reg.business_category or '-'}</p>
+                    <p><strong>Member Name:</strong> {reg.member_name or '-'}</p>
+                    <p><strong>Spouse / Kids Name:</strong> {reg.spouse_kids_name or '-'}</p>
+                    <p><strong>Selected Game:</strong> {reg.selected_game or '-'}</p>
                 </div>
             </div>
             <p style="margin-top:2rem;color:#666;">Present this admit card at registration desk.</p>

@@ -52,8 +52,9 @@ class FamilyRegistration(Base):
     name = Column(String(150), nullable=False)
     phone_number = Column(String(15), nullable=False)
     age_category = Column(String(50), nullable=True)
-    business_name = Column(String(200), nullable=True)
-    business_category = Column(String(100), nullable=True)
+    member_name = Column(String(150), nullable=True)
+    spouse_kids_name = Column(String(150), nullable=True)
+    selected_game = Column(String(200), nullable=True)
     photo_url = Column(String(500), nullable=True)
     registered_at = Column(DateTime(timezone=True), server_default=func.now())
 

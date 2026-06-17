@@ -279,7 +279,7 @@ export default function AdminDashboardPage() {
   });
 
   const filteredFamily = family.filter((r) => {
-    const s = matchesSearch([r.name, r.team_name ?? '', r.phone_number, r.business_name ?? '']);
+    const s = matchesSearch([r.name, r.team_name ?? '', r.phone_number, r.member_name ?? '', r.spouse_kids_name ?? '']);
     const t = activeTeam ? r.team_name === activeTeam : true;
     return s && t;
   });
@@ -328,11 +328,12 @@ export default function AdminDashboardPage() {
       rows.map((r, i) => ({
         '#': i + 1,
         'Chapter': r.team_name ?? '',
+        'Member Name': r.member_name ?? '',
+        'Spouse / Kids Name': r.spouse_kids_name ?? '',
         'Name': r.name,
         'Phone': r.phone_number,
         'Age Category': r.age_category ?? '',
-        'Business Name': r.business_name ?? '',
-        'Business Category': r.business_category ?? '',
+        'Selected Game': r.selected_game ?? '',
         'Photo': r.photo_url ?? 'Not Uploaded',
         'Registered': fmt(r.registered_at),
       })),
@@ -585,17 +586,18 @@ export default function AdminDashboardPage() {
                 </p>
               ) : (
                 <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', borderRadius: 'var(--radius-lg)' }}>
-                  <table className="data-table" style={{ minWidth: 1000 }}>
+                  <table className="data-table" style={{ minWidth: 1100 }}>
                     <thead>
                       <tr>
                         <th>#</th>
                         <th>Photo</th>
                         <th>Chapter</th>
+                        <th>Member Name</th>
+                        <th>Spouse / Kids Name</th>
                         <th>Name</th>
                         <th>Phone</th>
                         <th>Age Category</th>
-                        <th>Business Name</th>
-                        <th>Business Category</th>
+                        <th>Selected Game</th>
                         <th>Registered</th>
                       </tr>
                     </thead>
@@ -607,11 +609,12 @@ export default function AdminDashboardPage() {
                             <PhotoBadge url={r.photo_url} name={r.name} onClick={setLightbox} />
                           </td>
                           <td>{r.team_name ?? '—'}</td>
-                          <td style={{ fontWeight: 600 }}>{r.name}</td>
+                          <td style={{ fontWeight: 600 }}>{r.member_name ?? '—'}</td>
+                          <td>{r.spouse_kids_name ?? '—'}</td>
+                          <td>{r.name}</td>
                           <td>{r.phone_number}</td>
                           <td>{r.age_category ?? '—'}</td>
-                          <td>{r.business_name ?? '—'}</td>
-                          <td>{r.business_category ?? '—'}</td>
+                          <td>{r.selected_game ?? '—'}</td>
                           <td style={{ fontSize: '0.78rem', color: 'var(--charcoal-light)' }}>{fmt(r.registered_at)}</td>
                         </tr>
                       ))}
