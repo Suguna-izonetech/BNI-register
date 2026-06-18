@@ -482,7 +482,7 @@ export default function FamilyRegistrationPage() {
               </div>
 
               {/* Name (registrant) */}
-              <div className="form-group full-width">
+              {/* <div className="form-group full-width">
                 <label>Name <span className="required-star">*</span></label>
                 <input
                   type="text"
@@ -492,7 +492,7 @@ export default function FamilyRegistrationPage() {
                   className={errors.name ? 'error' : ''}
                 />
                 {errors.name && <span className="error-msg">{errors.name}</span>}
-              </div>
+              </div> */}
 
               {/* Phone */}
               <div className="form-group full-width">
