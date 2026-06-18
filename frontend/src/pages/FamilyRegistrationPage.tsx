@@ -66,18 +66,18 @@ function GamePicker({ selected, onChange, error }: GamePickerProps) {
 
   const label =
     selected.length === 0
-      ? `— Select up to ${MAX_GAMES} games —`
+      ? '— Select games —'
       : selected.join(', ');
 
   return (
     <div ref={containerRef} style={{ position: 'relative' }}>
-      {/* Trigger */}
+      {/* Trigger button */}
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
         style={{
           width: '100%',
-          padding: '0.65rem 2.2rem 0.65rem 0.9rem',
+          padding: '0.65rem 2.4rem 0.65rem 0.9rem',
           border: `1px solid ${error ? 'var(--red)' : 'var(--border)'}`,
           borderRadius: 'var(--radius)',
           background: 'var(--white)',
@@ -86,7 +86,6 @@ function GamePicker({ selected, onChange, error }: GamePickerProps) {
           color: selected.length === 0 ? '#999' : 'var(--charcoal)',
           cursor: 'pointer',
           textAlign: 'left',
-          position: 'relative',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -96,17 +95,15 @@ function GamePicker({ selected, onChange, error }: GamePickerProps) {
         aria-haspopup="listbox"
         aria-expanded={open}
       >
-        <span style={{
-          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1,
-        }}>
+        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
           {label}
         </span>
-        <span style={{ flexShrink: 0, fontSize: '0.75rem', color: 'var(--charcoal-light)' }}>
+        <span style={{ flexShrink: 0, fontSize: '0.7rem', color: 'var(--charcoal-light)', marginLeft: '0.25rem' }}>
           {open ? '▲' : '▼'}
         </span>
       </button>
 
-      {/* Badge showing count */}
+      {/* Selection count badge */}
       {selected.length > 0 && (
         <span style={{
           position: 'absolute', top: -8, right: -8,
@@ -145,65 +142,79 @@ function GamePicker({ selected, onChange, error }: GamePickerProps) {
             letterSpacing: '0.06em',
             color: 'var(--charcoal-light)',
           }}>
-            SELECT UP TO {MAX_GAMES} GAMES &nbsp;·&nbsp; {selected.length}/{MAX_GAMES} chosen
+            {selected.length} / {GAMES.length} SELECTED
           </div>
 
           {GAMES.map((game) => {
             const checked = selected.includes(game);
-            const disabled = !checked && selected.length >= MAX_GAMES;
             return (
-              <label
+              <div
                 key={game}
                 role="option"
                 aria-selected={checked}
+                onClick={() => toggle(game)}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.75rem',
                   padding: '0.65rem 0.9rem',
-                  cursor: disabled ? 'not-allowed' : 'pointer',
+                  cursor: 'pointer',
                   background: checked ? 'rgba(201,168,76,0.1)' : 'var(--white)',
                   borderBottom: '1px solid var(--cream-dark)',
-                  opacity: disabled ? 0.45 : 1,
                   transition: 'background 0.15s',
                   userSelect: 'none',
                 }}
                 onMouseEnter={(e) => {
-                  if (!disabled) (e.currentTarget as HTMLLabelElement).style.background = checked ? 'rgba(201,168,76,0.18)' : 'var(--cream)';
+                  (e.currentTarget as HTMLDivElement).style.background = checked
+                    ? 'rgba(201,168,76,0.18)'
+                    : 'var(--cream)';
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLLabelElement).style.background = checked ? 'rgba(201,168,76,0.1)' : 'var(--white)';
+                  (e.currentTarget as HTMLDivElement).style.background = checked
+                    ? 'rgba(201,168,76,0.1)'
+                    : 'var(--white)';
                 }}
               >
-                <input
-                  type="checkbox"
-                  checked={checked}
-                  disabled={disabled}
-                  onChange={() => toggle(game)}
-                  style={{ accentColor: 'var(--gold)', width: 16, height: 16, flexShrink: 0 }}
-                  aria-label={game}
-                />
+                {/* Custom checkbox */}
+                <span style={{
+                  flexShrink: 0,
+                  width: 18,
+                  height: 18,
+                  border: `2px solid ${checked ? 'var(--gold)' : 'var(--border)'}`,
+                  borderRadius: 4,
+                  background: checked ? 'var(--gold)' : 'var(--white)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.15s',
+                }}>
+                  {checked && (
+                    <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                      <path d="M1 3.5L3.8 6.5L9 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  )}
+                </span>
+
                 <span style={{
                   fontFamily: 'var(--font-body)',
                   fontSize: '0.9rem',
                   color: checked ? 'var(--gold-dark)' : 'var(--charcoal)',
-                  fontWeight: checked ? 700 : 400,
+                  fontWeight: checked ? 600 : 400,
                   lineHeight: 1.35,
                 }}>
                   {game}
                 </span>
-                {checked && (
-                  <span style={{
-                    marginLeft: 'auto', flexShrink: 0,
-                    color: 'var(--gold)', fontSize: '0.85rem', fontWeight: 700,
-                  }}>✓</span>
-                )}
-              </label>
+              </div>
             );
           })}
 
           {/* Done button */}
-          <div style={{ padding: '0.6rem 0.9rem', background: 'var(--cream-dark)', borderTop: '1px solid var(--border)', textAlign: 'right' }}>
+          <div style={{
+            padding: '0.6rem 0.9rem',
+            background: 'var(--cream-dark)',
+            borderTop: '1px solid var(--border)',
+            textAlign: 'right',
+          }}>
             <button
               type="button"
               onClick={() => setOpen(false)}
@@ -232,7 +243,6 @@ export default function FamilyRegistrationPage() {
   const [teamName, setTeamName] = useState('');
   const [memberName, setMemberName] = useState('');
   const [spouseKidsName, setSpouseKidsName] = useState('');
-  const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [ageCategory, setAgeCategory] = useState('');
   const [selectedGames, setSelectedGames] = useState<string[]>([]);
@@ -268,7 +278,6 @@ export default function FamilyRegistrationPage() {
     if (!teamName) e.teamName = 'Chapter is required';
     if (!memberName.trim()) e.memberName = 'Member name is required';
     if (!spouseKidsName.trim()) e.spouseKidsName = 'Spouse / Kids name is required';
-    if (!name.trim()) e.name = 'Name is required';
     if (!phone || !/^[6-9]\d{9}$/.test(phone)) e.phone = 'Enter valid 10-digit mobile number';
     if (!ageCategory) e.ageCategory = 'Age category is required';
     if (!selectedGames.length) e.selectedGame = 'Please select at least 1 game';
@@ -278,7 +287,7 @@ export default function FamilyRegistrationPage() {
 
   const resetForm = () => {
     setTeamName(''); setMemberName(''); setSpouseKidsName('');
-    setName(''); setPhone(''); setAgeCategory(''); setSelectedGames([]);
+    setPhone(''); setAgeCategory(''); setSelectedGames([]);
     setPhotoFile(null); setPhotoPreview(null); setErrors({});
     if (fileRef.current) fileRef.current.value = '';
   };
@@ -318,7 +327,6 @@ export default function FamilyRegistrationPage() {
                 <div class="field"><span class="label">Chapter:</span><span class="value">${submittedData.team_name}</span></div>
                 <div class="field"><span class="label">Member Name:</span><span class="value">${submittedData.member_name}</span></div>
                 <div class="field"><span class="label">Spouse / Kids Name:</span><span class="value">${submittedData.spouse_kids_name}</span></div>
-                <div class="field"><span class="label">Name:</span><span class="value">${submittedData.name}</span></div>
                 <div class="field"><span class="label">Phone Number:</span><span class="value">${submittedData.phone_number}</span></div>
                 <div class="field"><span class="label">Age Category:</span><span class="value">${submittedData.age_category}</span></div>
               </div>
@@ -359,7 +367,7 @@ export default function FamilyRegistrationPage() {
     try {
       await submitFamily({
         team_name: teamName,
-        name: name.trim(),
+        name: spouseKidsName.trim(),
         phone_number: `+91${phone}`,
         age_category: ageCategory,
         member_name: memberName.trim(),
@@ -371,7 +379,6 @@ export default function FamilyRegistrationPage() {
         team_name: teamName,
         member_name: memberName.trim(),
         spouse_kids_name: spouseKidsName.trim(),
-        name: name.trim(),
         phone_number: `+91${phone}`,
         age_category: ageCategory,
         selected_game: selectedGames.join(', '),
@@ -479,19 +486,6 @@ export default function FamilyRegistrationPage() {
                   className={errors.spouseKidsName ? 'error' : ''}
                 />
                 {errors.spouseKidsName && <span className="error-msg">{errors.spouseKidsName}</span>}
-              </div>
-
-              {/* Name (registrant) */}
-              <div className="form-group full-width">
-                <label>Name <span className="required-star">*</span></label>
-                <input
-                  type="text"
-                  placeholder="Registrant's full name"
-                  value={name}
-                  onChange={(e) => { setName(e.target.value); setErrors((p) => ({ ...p, name: '' })); }}
-                  className={errors.name ? 'error' : ''}
-                />
-                {errors.name && <span className="error-msg">{errors.name}</span>}
               </div>
 
               {/* Phone */}
